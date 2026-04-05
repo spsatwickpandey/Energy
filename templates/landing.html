@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Energy Optimizer — Intelligent Energy Management</title>
+  <meta name="description" content="AI-powered electricity consumption analysis and cost optimization for Indian households.">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #050A14;
+      --bg2:       #0D1B2A;
+      --card:      rgba(255,255,255,0.05);
+      --border:    rgba(255,214,0,0.25);
+      --gold:      #FFD600;
+      --gold-dim:  #FFA600;
+      --electric:  #00D4FF;
+      --text:      #FFFFFF;
+      --muted:     #8B9DB0;
+      --danger:    #FF5370;
+      --success:   #00E676;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── CANVAS BACKGROUND ── */
+    #bg-canvas {
+      position: fixed; inset: 0; z-index: 0;
+      width: 100%; height: 100%;
+      background: #050A14;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 18px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(5,10,20,0.7);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,214,0,0.15);
+    }
+    .nav-brand {
+      font-size: 1.35rem; font-weight: 800; color: var(--gold);
+      letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-brand .bolt { font-size: 1.5rem; animation: pulse-bolt 2s ease-in-out infinite; }
+    @keyframes pulse-bolt { 0%,100%{filter:drop-shadow(0 0 4px #FFD600);} 50%{filter:drop-shadow(0 0 14px #FFD600);} }
+
+    .nav-actions { display: flex; gap: 12px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 26px; border-radius: 10px; font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      border: none; outline: none; text-decoration: none;
+      transition: all 0.25s ease; position: relative; overflow: hidden;
+    }
+    .btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(255,255,255,0.08); opacity: 0; transition: opacity 0.2s;
+    }
+    .btn:hover::after { opacity: 1; }
+
+    .btn-ghost {
+      background: transparent; border: 1.5px solid var(--border); color: var(--gold);
+    }
+    .btn-ghost:hover { border-color: var(--gold); box-shadow: 0 0 16px rgba(255,214,0,0.2); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+      color: #050A14; box-shadow: 0 4px 20px rgba(255,214,0,0.3);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 28px rgba(255,214,0,0.5); transform: translateY(-1px); }
+
+    .btn-sm { padding: 8px 18px; font-size: 0.875rem; }
+    .btn-block { width: 100%; justify-content: center; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 100px 24px 60px;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,214,0,0.1); border: 1px solid rgba(255,214,0,0.3);
+      color: var(--gold); padding: 7px 18px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.5px;
+      margin-bottom: 28px; text-transform: uppercase;
+      animation: fadeSlideDown 0.6s ease both;
+    }
+    @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-16px);} to{opacity:1;transform:none;} }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -1.5px; margin-bottom: 22px;
+      animation: fadeSlideUp 0.7s ease 0.1s both;
+    }
+    @keyframes fadeSlideUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:none;} }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 50%, #FF8C00 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem); color: var(--muted);
+      max-width: 560px; line-height: 1.7; margin-bottom: 42px;
+      animation: fadeSlideUp 0.7s ease 0.2s both;
+    }
+
+    .hero-cta {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      animation: fadeSlideUp 0.7s ease 0.3s both;
+    }
+
+    /* ── STATS ── */
+    .stats {
+      display: flex; gap: 28px; flex-wrap: wrap; justify-content: center;
+      margin: 60px auto 80px; max-width: 820px;
+      position: relative; z-index: 1;
+      animation: fadeSlideUp 0.8s ease 0.4s both;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 36px;
+      text-align: center; flex: 1; min-width: 180px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 8px 32px rgba(255,214,0,0.15); }
+    .stat-num { font-size: 2.2rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+
+    /* ── FEATURES ── */
+    .features {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto 100px;
+      padding: 0 24px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px; padding: 32px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .feature-card:hover { transform: translateY(-6px); border-color: var(--border); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    .feature-icon {
+      width: 54px; height: 54px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 18px;
+    }
+    .feature-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+    .feature-card p  { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
+
+    /* ── MODAL ── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(5,10,20,0.85);
+      backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.2s ease;
+    }
+    .overlay.open { display: flex; }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+    .modal {
+      background: linear-gradient(145deg, #0D1B2A, #111E30);
+      border: 1px solid var(--border);
+      border-radius: 24px; padding: 40px;
+      width: 100%; max-width: 440px;
+      position: relative;
+      animation: slideUp 0.3s ease;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:none;} }
+
+    .modal-close {
+      position: absolute; top: 16px; right: 18px;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.4rem; cursor: pointer; line-height: 1;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .modal-logo {
+      font-size: 2rem; margin-bottom: 6px; display: block; text-align: center;
+      animation: pulse-bolt 2s ease-in-out infinite;
+    }
+    .modal-title {
+      font-size: 1.5rem; font-weight: 800; text-align: center;
+      color: var(--gold); margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 0.875rem; color: var(--muted); text-align: center;
+      margin-bottom: 28px;
+    }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+    .form-control {
+      width: 100%; background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 13px 16px;
+      color: var(--text); font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255,214,0,0.12); }
+    .form-control::placeholder { color: rgba(255,255,255,0.25); }
+
+    .otp-input {
+      letter-spacing: 10px; font-size: 1.6rem; font-weight: 700;
+      text-align: center; font-family: monospace;
+    }
+
+    /* ── ALERTS ── */
+    .alert {
+      padding: 11px 16px; border-radius: 10px;
+      font-size: 0.875rem; margin-bottom: 16px; display: none;
+    }
+    .alert.show { display: block; }
+    .alert-error   { background: rgba(255,83,112,0.12); border: 1px solid rgba(255,83,112,0.35); color: #FF5370; }
+    .alert-success { background: rgba(0,230,118,0.1);  border: 1px solid rgba(0,230,118,0.3);  color: #00E676; }
+
+    /* ── STEPS ── */
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .step-indicator {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; justify-content: center;
+    }
+    .step-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); transition: all 0.3s;
+    }
+    .step-dot.active { background: var(--gold); box-shadow: 0 0 8px rgba(255,214,0,0.5); }
+
+    /* ── DIVIDER ── */
+    .modal-switch {
+      margin-top: 22px; text-align: center;
+      font-size: 0.875rem; color: var(--muted);
+    }
+    .modal-switch a {
+      color: var(--gold); font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .modal-switch a:hover { opacity: 0.8; }
+
+    /* ── SPINNER ── */
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #050A14; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center; padding: 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted); font-size: 0.82rem;
+    }
+    footer span { color: var(--gold); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 14px 20px; }
+      .modal { padding: 28px 20px; }
+      .hero-cta .btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- ── NAV ──────────────────────────────────────── -->
+  <nav>
+    <a href="/" class="nav-brand">
+      <span class="bolt">⚡</span> Smart Energy Optimizer
+    </a>
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('signinModal')">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('signupModal')">
+        <i class="fas fa-user-plus"></i> Get Started
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-badge">
+      <i class="fas fa-bolt"></i> AI-Powered Energy Intelligence
+    </div>
+    <h1>Optimize Your<br><span>Electricity Bill</span><br>with AI</h1>
+    <p class="hero-sub">
+      Enter your appliances, get accurate consumption predictions, smart billing breakdowns,
+      and personalized AI recommendations — all in seconds.
+    </p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="openModal('signupModal')">
+        <i class="fas fa-rocket"></i> Create Free Account
+      </button>
+      <button class="btn btn-ghost" onclick="openModal('signinModal')">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+    </div>
+  </section>
+
+  <!-- ── STATS ──────────────────────────────────────── -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num">10+</div>
+      <div class="stat-label">Appliance Types Supported</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">₹0</div>
+      <div class="stat-label">Cost to Use</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">AI</div>
+      <div class="stat-label">LLaMA-Powered Recommendations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Personalized to Your Home</div>
+    </div>
+  </div>
+
+  <!-- ── FEATURES ──────────────────────────────────── -->
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,214,0,0.12); color:#FFD600;">
+        <i class="fas fa-brain"></i>
+      </div>
+      <h3>ML-Powered Predictions</h3>
+      <p>Our trained machine learning model predicts monthly electricity consumption per appliance with high accuracy.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(0,212,255,0.12); color:#00D4FF;">
+        <i class="fas fa-file-invoice-dollar"></i>
+      </div>
+      <h3>Detailed Bill Breakdown</h3>
+      <p>Get a complete slab-wise electricity bill breakdown with fixed charges, energy charges, and duty — just like your real bill.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(0,230,118,0.12); color:#00E676;">
+        <i class="fas fa-robot"></i>
+      </div>
+      <h3>AI Recommendations</h3>
+      <p>Groq LLaMA analyzes your real appliance data and gives personalized, actionable energy-saving tips.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,83,112,0.12); color:#FF5370;">
+        <i class="fas fa-file-pdf"></i>
+      </div>
+      <h3>PDF Report Download</h3>
+      <p>Download a complete, branded analysis report with all inputs, outputs, bill details, and AI recommendations in one PDF.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(255,214,0,0.12); color:#FFD600;">
+        <i class="fas fa-database"></i>
+      </div>
+      <h3>Session History</h3>
+      <p>All your analyses are saved securely in the cloud linked to your account — revisit or compare anytime.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:rgba(0,212,255,0.12); color:#00D4FF;">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h3>Secure & Private</h3>
+      <p>Email OTP verification, bcrypt password hashing, and encrypted sessions keep your data safe.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2024 <span>Smart Energy Optimizer</span> · Built for Indian Households</p>
+  </footer>
+
+  <!-- ═══════════════ SIGN UP MODAL ═══════════════ -->
+  <div class="overlay" id="signupModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signup-title">
+      <button class="modal-close" onclick="closeModal('signupModal')" aria-label="Close">&times;</button>
+
+      <span class="modal-logo">⚡</span>
+      <h2 class="modal-title" id="signup-title">Create Account</h2>
+      <p class="modal-subtitle">Join to start optimizing your energy usage</p>
+
+      <div class="step-indicator">
+        <div class="step-dot active" id="su-dot-1"></div>
+        <div style="width:40px;height:1px;background:rgba(255,255,255,0.15);"></div>
+        <div class="step-dot" id="su-dot-2"></div>
+      </div>
+
+      <div id="su-alert" class="alert"></div>
+
+      <!-- STEP 1 -->
+      <div class="step active" id="su-step1">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" id="su-name" type="text" placeholder="Satwick Pandey" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-control" id="su-email" type="email" placeholder="you@gmail.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span style="color:var(--muted);font-weight:400;">(min 8 characters)</span></label>
+          <input class="form-control" id="su-password" type="password" placeholder="Create a strong password" autocomplete="new-password">
+        </div>
+        <button class="btn btn-primary btn-block" id="su-send-btn" onclick="handleSignup()">
+          Send OTP Code
+        </button>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" id="su-step2">
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:20px;line-height:1.6;">
+          We sent a 6-digit code to <strong id="su-email-display" style="color:var(--gold);"></strong>
+        </p>
+        <div class="form-group">
+          <label class="form-label">Verification Code</label>
+          <input class="form-control otp-input" id="su-otp" type="text" maxlength="6" placeholder="000000" inputmode="numeric">
+        </div>
+        <button class="btn btn-primary btn-block" id="su-verify-btn" onclick="handleVerifyOtp()">
+          Verify &amp; Create Account
+        </button>
+        <p style="text-align:center;margin-top:14px;font-size:0.83rem;color:var(--muted);">
+          Didn't receive it? <a onclick="handleResendOtp()" style="cursor:pointer;">Resend OTP</a>
+        </p>
+      </div>
+
+      <div class="modal-switch">
+        Already have an account?
+        <a onclick="switchModal('signupModal','signinModal')">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SIGN IN MODAL ═══════════════ -->
+  <div class="overlay" id="signinModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signin-title">
+      <button class="modal-close" onclick="closeModal('signinModal')" aria-label="Close">&times;</button>
+
+      <span class="modal-logo">⚡</span>
+      <h2 class="modal-title" id="signin-title">Welcome Back</h2>
+      <p class="modal-subtitle">Sign in to access your energy dashboard</p>
+
+      <div id="si-alert" class="alert"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-control" id="si-email" type="email" placeholder="you@gmail.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-control" id="si-password" type="password" placeholder="Your password" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary btn-block" id="si-btn" onclick="handleSignin()">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+
+      <div class="modal-switch">
+        Don't have an account?
+        <a onclick="switchModal('signinModal','signupModal')">Create one</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════════════
+    //  ELECTRICAL CIRCUIT CANVAS BACKGROUND
+    // ══════════════════════════════════════════════════════
+    (function () {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx    = canvas.getContext('2d');
+
+      // ── Colour palette ────────────────────────────────
+      const GOLD    = 'rgba(255,214,0,';
+      const BLUE    = 'rgba(0,212,255,';
+      const WHITE   = 'rgba(255,255,255,';
+      const GRID_W  = 80;   // circuit cell size px
+
+      let W, H, nodes = [], particles = [], pulses = [], bolts = [];
+
+      // ── Resize ────────────────────────────────────────
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        buildGrid();
+      }
+      window.addEventListener('resize', resize);
+
+      // ── Build circuit node grid ───────────────────────
+      function buildGrid() {
+        nodes = [];
+        const cols = Math.ceil(W / GRID_W) + 1;
+        const rows = Math.ceil(H / GRID_W) + 1;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            // Only keep ~35% of nodes for a sparse circuit look
+            if (Math.random() > 0.35) continue;
+            nodes.push({
+              x: c * GRID_W + (Math.random() * 20 - 10),
+              y: r * GRID_W + (Math.random() * 20 - 10),
+              r:     Math.random() * 2.5 + 1,
+              glow:  Math.random(),
+              gdelta: (Math.random() * 0.008 + 0.003) * (Math.random() < 0.5 ? 1 : -1),
+              color: Math.random() < 0.7 ? GOLD : BLUE,
+            });
+          }
+        }
+        // Seed initial energy particles
+        particles = [];
+        for (let i = 0; i < 60; i++) spawnParticle();
+      }
+
+      // ── Energy particle along a random edge ──────────
+      function spawnParticle() {
+        if (nodes.length < 2) return;
+        const a = nodes[Math.floor(Math.random() * nodes.length)];
+        const nearby = nodes
+          .filter(n => n !== a && dist(n, a) < GRID_W * 2.4)
+          .sort((x, y) => dist(x, a) - dist(y, a));
+        if (!nearby.length) return;
+        const b = nearby[Math.floor(Math.random() * Math.min(3, nearby.length))];
+        particles.push({
+          ax: a.x, ay: a.y, bx: b.x, by: b.y,
+          t: 0,
+          speed: Math.random() * 0.006 + 0.003,
+          size:  Math.random() * 2.5 + 1,
+          color: Math.random() < 0.6 ? GOLD : BLUE,
+          trail: [],
+        });
+      }
+
+      function dist(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+
+      // ── Lightning bolt ────────────────────────────────
+      function spawnBolt() {
+        if (nodes.length < 2) return;
+        const a = nodes[Math.floor(Math.random() * nodes.length)];
+        const b = nodes[Math.floor(Math.random() * nodes.length)];
+        const segs = [];
+        const steps = 8 + Math.floor(Math.random() * 8);
+        for (let i = 0; i <= steps; i++) {
+          const t  = i / steps;
+          const jx = i > 0 && i < steps ? (Math.random() - 0.5) * 28 : 0;
+          const jy = i > 0 && i < steps ? (Math.random() - 0.5) * 28 : 0;
+          segs.push({
+            x: a.x + (b.x - a.x) * t + jx,
+            y: a.y + (b.y - a.y) * t + jy,
+          });
+        }
+        bolts.push({ segs, life: 1, col: Math.random() < 0.6 ? GOLD : BLUE });
+      }
+
+      // ── Energy pulse ring ─────────────────────────────
+      function spawnPulse() {
+        if (!nodes.length) return;
+        const n = nodes[Math.floor(Math.random() * nodes.length)];
+        pulses.push({ x: n.x, y: n.y, r: 4, maxR: 80 + Math.random() * 80,
+                      life: 1, color: Math.random() < 0.6 ? GOLD : BLUE });
+      }
+
+      // ── Background base gradient ──────────────────────
+      function drawBg() {
+        const grd = ctx.createRadialGradient(W * 0.5, 0, 0, W * 0.5, H * 0.4, H * 0.9);
+        grd.addColorStop(0,   'rgba(20,30,55,1)');
+        grd.addColorStop(0.5, 'rgba(7,14,28,1)');
+        grd.addColorStop(1,   'rgba(3,6,16,1)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, W, H);
+
+        // Subtle top gold halo
+        const halo = ctx.createRadialGradient(W * 0.5, -H * 0.1, 0, W * 0.5, -H * 0.1, H * 0.7);
+        halo.addColorStop(0,   'rgba(255,214,0,0.06)');
+        halo.addColorStop(0.6, 'rgba(255,214,0,0.01)');
+        halo.addColorStop(1,   'transparent');
+        ctx.fillStyle = halo;
+        ctx.fillRect(0, 0, W, H);
+
+        // Bottom-right cyan halo
+        const cyan = ctx.createRadialGradient(W, H, 0, W, H, H * 0.6);
+        cyan.addColorStop(0,   'rgba(0,212,255,0.05)');
+        cyan.addColorStop(1,   'transparent');
+        ctx.fillStyle = cyan;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // ── Draw circuit edges between nearby nodes ───────
+      function drawEdges() {
+        ctx.save();
+        for (let i = 0; i < nodes.length; i++) {
+          const a = nodes[i];
+          for (let j = i + 1; j < nodes.length; j++) {
+            const b = nodes[j];
+            const d = dist(a, b);
+            if (d > GRID_W * 2.0) continue;
+            const alpha = (1 - d / (GRID_W * 2.0)) * 0.18;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            // slight right-angle routing for PCB look
+            const mx = Math.random() < 0.5 ? b.x : a.x;
+            const my = Math.random() < 0.5 ? b.y : a.y;
+            ctx.lineTo(mx, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = (a.color || GOLD) + alpha + ')';
+            ctx.lineWidth   = 0.6;
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+      }
+
+      // ── Draw node dots ────────────────────────────────
+      function drawNodes(dt) {
+        nodes.forEach(n => {
+          // Pulsing glow
+          n.glow += n.gdelta * dt * 60;
+          if (n.glow > 1 || n.glow < 0) n.gdelta *= -1;
+          const g = 0.3 + n.glow * 0.7;
+
+          // Outer glow
+          const gr = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 6);
+          gr.addColorStop(0,   n.color + (g * 0.5) + ')');
+          gr.addColorStop(1,   n.color + '0)');
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r * 6, 0, Math.PI * 2);
+          ctx.fillStyle = gr;
+          ctx.fill();
+
+          // Core dot
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+          ctx.fillStyle = n.color + g + ')';
+          ctx.fill();
+        });
+      }
+
+      // ── Draw flowing energy particles ─────────────────
+      function drawParticles(dt) {
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.t += p.speed * dt * 60;
+
+          const x = p.ax + (p.bx - p.ax) * p.t;
+          const y = p.ay + (p.by - p.ay) * p.t;
+          p.trail.push({ x, y });
+          if (p.trail.length > 14) p.trail.shift();
+
+          // Draw trail
+          p.trail.forEach((pt, idx) => {
+            const a = (idx / p.trail.length) * 0.9;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, p.size * (idx / p.trail.length), 0, Math.PI * 2);
+            ctx.fillStyle = p.color + a + ')';
+            ctx.fill();
+          });
+
+          if (p.t >= 1) {
+            particles.splice(i, 1);
+            spawnParticle();
+          }
+        }
+      }
+
+      // ── Draw lightning bolts ──────────────────────────
+      function drawBolts(dt) {
+        for (let i = bolts.length - 1; i >= 0; i--) {
+          const b = bolts[i];
+          b.life -= 0.04 * dt * 60;
+          if (b.life <= 0) { bolts.splice(i, 1); continue; }
+
+          ctx.save();
+          ctx.shadowBlur  = 12;
+          ctx.shadowColor = b.col + '1)';
+          ctx.strokeStyle = b.col + b.life + ')';
+          ctx.lineWidth   = 1 + b.life;
+          ctx.beginPath();
+          ctx.moveTo(b.segs[0].x, b.segs[0].y);
+          b.segs.forEach(s => ctx.lineTo(s.x, s.y));
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      // ── Draw pulse rings ──────────────────────────────
+      function drawPulses(dt) {
+        for (let i = pulses.length - 1; i >= 0; i--) {
+          const p = pulses[i];
+          p.r    += (p.maxR - p.r) * 0.04 * dt * 60;
+          p.life -= 0.018 * dt * 60;
+          if (p.life <= 0) { pulses.splice(i, 1); continue; }
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.strokeStyle = p.color + (p.life * 0.5) + ')';
+          ctx.lineWidth   = 1.5;
+          ctx.shadowBlur  = 8;
+          ctx.shadowColor = p.color + p.life + ')';
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      // ── Scanline overlay ──────────────────────────────
+      function drawScanlines() {
+        ctx.save();
+        ctx.globalAlpha = 0.025;
+        for (let y = 0; y < H; y += 3) {
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, y, W, 1);
+        }
+        ctx.restore();
+      }
+
+      // ── Main loop ─────────────────────────────────────
+      let last = 0;
+      let boltTimer = 0;
+      let pulseTimer = 0;
+
+      function loop(ts) {
+        const dt = Math.min((ts - last) / 16.67, 3);
+        last = ts;
+
+        // Timed spawns
+        boltTimer  += dt;
+        pulseTimer += dt;
+        if (boltTimer  > 90  + Math.random() * 60)  { spawnBolt();  boltTimer  = 0; }
+        if (pulseTimer > 120 + Math.random() * 80)  { spawnPulse(); pulseTimer = 0; }
+
+        drawBg();
+        drawEdges();
+        drawNodes(dt);
+        drawParticles(dt);
+        drawBolts(dt);
+        drawPulses(dt);
+        drawScanlines();
+
+        requestAnimationFrame(loop);
+      }
+
+      resize();
+      requestAnimationFrame(loop);
+    })();
+
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function switchModal(from, to) {
+      closeModal(from);
+      openModal(to);
+    }
+    // Close on overlay click
+    document.querySelectorAll('.overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+    });
+    // Close on Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('.overlay.open').forEach(o => closeModal(o.id));
+    });
+
+    // ── ALERT HELPER ──────────────────────────────────────
+    function showAlert(id, msg, type='error') {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = `alert show alert-${type}`;
+    }
+    function clearAlert(id) {
+      const el = document.getElementById(id);
+      el.className = 'alert';
+      el.textContent = '';
+    }
+
+    // ── BUTTON LOADING STATE ──────────────────────────────
+    function setLoading(btnId, loading, text='') {
+      const btn = document.getElementById(btnId);
+      btn.disabled = loading;
+      btn.innerHTML = loading
+        ? `<span class="spinner"></span> ${text}`
+        : text || btn.dataset.defaultText || btn.innerHTML;
+      if (text && !loading) btn.innerHTML = text;
+    }
+
+    // ── SIGN UP — STEP 1 ──────────────────────────────────
+    async function handleSignup() {
+      clearAlert('su-alert');
+      const name     = document.getElementById('su-name').value.trim();
+      const email    = document.getElementById('su-email').value.trim();
+      const password = document.getElementById('su-password').value;
+
+      if (!name || !email || !password) { showAlert('su-alert','Please fill in all fields.'); return; }
+      if (!/\S+@\S+\.\S+/.test(email))  { showAlert('su-alert','Please enter a valid email.'); return; }
+      if (password.length < 8)           { showAlert('su-alert','Password must be at least 8 characters.'); return; }
+
+      setLoading('su-send-btn', true, 'Sending OTP…');
+      try {
+        const res  = await fetch('/auth/signup', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, password})});
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('su-email-display').textContent = email;
+          document.getElementById('su-step1').classList.remove('active');
+          document.getElementById('su-step2').classList.add('active');
+          document.getElementById('su-dot-1').classList.remove('active');
+          document.getElementById('su-dot-2').classList.add('active');
+          showAlert('su-alert', '✓ OTP sent! Check your inbox.', 'success');
+        } else {
+          showAlert('su-alert', data.error || 'Something went wrong.');
+        }
+      } catch (e) {
+        showAlert('su-alert', 'Network error. Please try again.');
+      } finally {
+        setLoading('su-send-btn', false, 'Send OTP Code');
+      }
+    }
+
+    // ── SIGN UP — STEP 2 (OTP verify) ────────────────────
+    async function handleVerifyOtp() {
+      clearAlert('su-alert');
+      const email = document.getElementById('su-email').value.trim();
+      const otp   = document.getElementById('su-otp').value.trim();
+      if (!otp || otp.length < 6) { showAlert('su-alert','Please enter the 6-digit OTP.'); return; }
+
+      setLoading('su-verify-btn', true, 'Verifying…');
+      try {
+        const res  = await fetch('/auth/verify-otp', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, otp})});
+        const data = await res.json();
+        if (data.success) {
+          showAlert('su-alert', `✓ Welcome, ${data.name}! Redirecting…`, 'success');
+          setTimeout(() => { window.location.href = '/model'; }, 1200);
+        } else {
+          showAlert('su-alert', data.error || 'Invalid OTP.');
+        }
+      } catch (e) {
+        showAlert('su-alert', 'Network error. Please try again.');
+      } finally {
+        setLoading('su-verify-btn', false, 'Verify &amp; Create Account');
+      }
+    }
+
+    // ── RESEND OTP ────────────────────────────────────────
+    async function handleResendOtp() {
+      const email = document.getElementById('su-email').value.trim();
+      if (!email) return;
+      clearAlert('su-alert');
+      try {
+        const res  = await fetch('/auth/resend-otp', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email})});
+        const data = await res.json();
+        showAlert('su-alert', data.success ? '✓ New OTP sent!' : (data.error || 'Failed.'), data.success ? 'success' : 'error');
+      } catch { showAlert('su-alert','Network error.'); }
+    }
+
+    // ── SIGN IN ───────────────────────────────────────────
+    async function handleSignin() {
+      clearAlert('si-alert');
+      const email    = document.getElementById('si-email').value.trim();
+      const password = document.getElementById('si-password').value;
+      if (!email || !password) { showAlert('si-alert','Please fill in all fields.'); return; }
+
+      setLoading('si-btn', true, 'Signing in…');
+      try {
+        const res  = await fetch('/auth/signin', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password})});
+        const data = await res.json();
+        if (data.success) {
+          showAlert('si-alert', `✓ Welcome back, ${data.name}! Redirecting…`, 'success');
+          setTimeout(() => { window.location.href = '/model'; }, 1000);
+        } else {
+          showAlert('si-alert', data.error || 'Sign in failed.');
+        }
+      } catch (e) {
+        showAlert('si-alert', 'Network error. Please try again.');
+      } finally {
+        setLoading('si-btn', false, '<i class="fas fa-sign-in-alt"></i> Sign In');
+      }
+    }
+
+    // ── ENTER KEY SUPPORT ─────────────────────────────────
+    document.getElementById('si-password').addEventListener('keydown', e => { if(e.key==='Enter') handleSignin(); });
+    document.getElementById('su-password').addEventListener('keydown', e => { if(e.key==='Enter') handleSignup(); });
+    document.getElementById('su-otp').addEventListener('keydown',      e => { if(e.key==='Enter') handleVerifyOtp(); });
+  </script>
+</body>
+</html>

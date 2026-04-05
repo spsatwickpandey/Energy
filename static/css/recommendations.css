@@ -1,0 +1,329 @@
+/* True Dark Mode & Yellow Accent Theme - Enhanced for All UI Components */
+:root {
+  --dark-bg: #181818;
+  --dark-surface: #232323;
+  --dark-header: #22201a;
+  --dark-yellow: #ffd600;
+  --dark-yellow-contrast: #ffec80;
+  --dark-text: #f5f5f5;
+  --dark-secondary: #292929;
+  --dark-border: #333;
+  --dark-card-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+body, .main-content {
+  background-color: var(--dark-bg) !important;
+  color: var(--dark-text) !important;
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(90deg, #22201a 80%, #ffd600 100%) !important;
+  box-shadow: 0 2px 8px #ffd60044;
+}
+.navbar .navbar-brand, .navbar .nav-link, .navbar .fas {
+  color: #ffd600 !important;
+}
+.navbar .nav-link.active {
+  font-weight: bold;
+  border-bottom: 2px solid #ffd600;
+}
+
+/* Footer */
+.footer {
+  background: #22201a !important;
+  color: #ffd600 !important;
+  border-top: 2px solid #ffd600;
+  padding: 2rem 0;
+  margin-top: auto;
+}
+.footer p { color: #ffd600 !important; }
+
+/* Card, Table, and Section Styles */
+.card, .result-card, .stat-box, .bill-details .card, .analysis-section .card, .recommendation-card, .appliance-card {
+  background: var(--dark-surface) !important;
+  color: var(--dark-text) !important;
+  border: 1.5px solid var(--dark-border) !important;
+  box-shadow: var(--dark-card-shadow);
+}
+.card-header, .bill-details .card-header, .analysis-section .card-header, .recommendation-header {
+  background: linear-gradient(90deg, var(--dark-header) 80%, var(--dark-yellow) 100%) !important;
+  color: #22201a !important;
+  border-bottom: 1.5px solid var(--dark-yellow);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Add Appliance Section */
+.appliance-card {
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  background: var(--dark-secondary);
+  color: var(--dark-text);
+  border: 1.5px solid var(--dark-yellow);
+  box-shadow: 0 2px 8px #ffd60022;
+}
+
+/* Table Styles */
+.table, .table-striped, .table-sm {
+  background: var(--dark-surface) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #232323 !important;
+}
+.table-striped > tbody > tr:nth-of-type(even) {
+  background-color: #181818 !important;
+}
+.table th, .table td {
+  border-color: var(--dark-border) !important;
+}
+
+/* Button Styles */
+.btn, .btn-primary, .btn-success, .btn-outline-success, .btn-warning {
+  background: var(--dark-yellow);
+  color: #22201a !important;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(255,214,0,0.08);
+}
+.btn:hover, .btn:focus {
+  background: #ffe066 !important;
+  color: #181818 !important;
+  box-shadow: 0 4px 16px rgba(255,214,0,0.18);
+}
+
+input, select, textarea {
+  background: #232323 !important;
+  color: var(--dark-text) !important;
+  border: 1.5px solid var(--dark-yellow) !important;
+  border-radius: 6px;
+  padding: 0.5em 1em;
+}
+::-webkit-input-placeholder { color: #bdbdbd; }
+::-moz-placeholder { color: #bdbdbd; }
+:-ms-input-placeholder { color: #bdbdbd; }
+::placeholder { color: #bdbdbd; }
+
+/* Tooltip Styles */
+.tooltip-inner {
+  background: #22201a !important;
+  color: #ffd600 !important;
+  border: 1px solid #ffd600;
+  font-weight: 500;
+}
+.tooltip .arrow::before {
+  border-top-color: #ffd600 !important;
+}
+
+/* Spinner and Loading */
+.loading-spinner .spinner-border {
+  color: var(--dark-yellow) !important;
+}
+
+/* Section Spacing */
+.card, .recommendation-card, .result-card, .analysis-section .card {
+  margin-bottom: 2rem;
+}
+
+/* Chart.js dark mode tweaks */
+canvas { background: var(--dark-secondary); border-radius: 10px; }
+#loadChart, #consumptionChart {
+  height: 300px !important;
+  max-height: 350px;
+}
+
+/* Responsive layout for analysis section (charts + recommendations) */
+.analysis-section .row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .analysis-section .row {
+    flex-direction: row !important;
+    gap: 2rem;
+  }
+  .analysis-section .col-md-7, .analysis-section .col-md-5 {
+    margin-bottom: 0 !important;
+  }
+}
+
+.analysis-section .card {
+  margin-bottom: 0;
+}
+
+/* Chart cards */
+.analysis-section .card-body {
+  padding: 1rem 1rem 1.5rem 1rem;
+}
+@media (max-width: 576px) {
+  .analysis-section .card-body {
+    padding: 0.75rem 0.5rem 1rem 0.5rem;
+  }
+  .recommendation-header h4, .analysis-section h4, .analysis-section h5 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Recommendation card tweaks */
+.recommendation-card {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding-bottom: 1rem;
+}
+.recommendation-header {
+  padding: 1rem 1rem 0.5rem 1rem;
+  border-radius: 15px 15px 0 0;
+}
+.recommendation-body {
+  padding: 1rem 1.2rem 0.5rem 1.2rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+@media (max-width: 576px) {
+  .recommendation-body {
+    padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+  }
+}
+
+/* Chart canvas responsive sizing */
+#loadChart, #consumptionChart {
+  width: 100% !important;
+  height: 220px !important;
+  max-height: 250px;
+  min-height: 180px;
+  display: block;
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  #loadChart, #consumptionChart {
+    height: 300px !important;
+    max-height: 350px;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .recommendation-body { padding: 1rem; }
+  .card, .recommendation-card, .result-card { margin-bottom: 1rem; }
+} 
+
+.analysis-stack {
+  display: flex;
+  flex-direction: column !important;
+  gap: 2rem;
+  width: 100%;
+  align-items: center;
+}
+
+.analysis-stack > .card,
+.analysis-stack > .recommendation-section {
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0;
+}
+
+#loadChartContainer, #consumptionChartContainer {
+  height: 250px;
+  max-height: 250px;
+  min-height: 250px;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto 1rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark-secondary);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #ffd60022;
+  padding: 10px 0;
+}
+#loadChart, #consumptionChart {
+  width: 400px !important;
+  height: 250px !important;
+  max-width: 100%;
+  max-height: 250px;
+  min-width: 200px;
+  min-height: 180px;
+  display: block;
+  margin: 0 auto;
+  background: var(--dark-secondary);
+  border-radius: 10px;
+}
+@media (max-width: 576px) {
+  #loadChartContainer, #consumptionChartContainer {
+    height: 200px;
+    max-height: 220px;
+    min-height: 180px;
+    padding: 0;
+  }
+  #loadChart, #consumptionChart {
+    width: 100% !important;
+    min-width: 0;
+    height: 180px !important;
+    max-height: 200px;
+  }
+} 
+
+.ai-explanation-box {
+  background: #232323;
+  color: #ffd600;
+  border: 1.5px solid #ffd600;
+  border-radius: 8px;
+  font-size: 1.08em;
+  font-weight: 500;
+  margin-bottom: 1.2em;
+  padding: 1em;
+  word-break: break-word;
+} 
+
+.usage-hours, .usage-hours-container input[type='number'] {
+  background: #232323 !important;
+  color: #ffd600 !important;
+  border: 1.5px solid #ffd600 !important;
+  border-radius: 6px !important;
+  padding: 0.5em 1em !important;
+  font-weight: 500;
+  box-shadow: none !important;
+}
+.usage-hours:focus, .usage-hours-container input[type='number']:focus {
+  outline: none !important;
+  border-color: #ffe066 !important;
+  background: #292929 !important;
+}
+.usage-hours-container label {
+  color: #ffd600 !important;
+  font-weight: 500;
+} 
+
+.household-profile-box {
+  background: #232323;
+  color: #ffd600;
+  border: 1.5px solid #ffd600;
+  border-radius: 10px;
+  padding: 1em 1.5em;
+  margin-bottom: 1.5em;
+  text-align: center;
+  font-size: 1.08em;
+  font-weight: 500;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (min-width: 768px) {
+  .analysis-section .row {
+    flex-direction: row !important;
+    gap: 2rem;
+  }
+} 

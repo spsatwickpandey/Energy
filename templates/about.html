@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Smart Energy Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/recommendations.css">
+    <style>
+        body { background: #181818; color: #ffd600; }
+        .about-header { background: linear-gradient(90deg, #22201a 80%, #ffd600 100%); color: #ffd600; border-radius: 0 0 20px 20px; box-shadow: 0 2px 8px #ffd60044; }
+        .about-section { background: #232323; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); padding: 2rem; margin-bottom: 2rem; }
+        .about-icon { font-size: 2.5rem; color: #ffd600; margin-bottom: 1rem; }
+        .about-feature { text-align: center; margin-bottom: 2rem; }
+        .about-feature h5 { color: #ffd600; font-weight: 600; }
+        .about-infographic { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; }
+        .about-infographic .card { background: #292929; color: #ffd600; border: 1.5px solid #ffd600; border-radius: 12px; min-width: 220px; max-width: 320px; margin: 0.5rem; }
+        .about-infographic .card-body { text-align: center; }
+        .tech-icons i { font-size: 2rem; margin: 0 0.5rem; color: #ffd600; }
+        .go-back-btn { position: absolute; top: 24px; left: 24px; z-index: 10; background: #ffd600; color: #22201a; border: none; border-radius: 8px; font-weight: 600; padding: 8px 18px; transition: background 0.2s; }
+        .go-back-btn:hover { background: #ffe066; color: #181818; }
+        .about-footer { background: #22201a; color: #ffd600; border-top: 2px solid #ffd600; padding: 1.5rem 0 0.5rem 0; text-align: center; border-radius: 16px 16px 0 0; margin-top: 3rem; }
+        .about-footer a { color: #ffd600; text-decoration: underline; margin: 0 0.5em; }
+        @media (max-width: 576px) { .about-section { padding: 1rem; } .go-back-btn { top: 12px; left: 12px; padding: 6px 12px; font-size: 0.95em; } }
+    </style>
+</head>
+<body>
+    <button class="go-back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left me-2"></i>Go Back</button>
+    <div class="about-header py-4 text-center mb-4">
+        <h1 class="fw-bold mb-2"><i class="fas fa-bolt me-2"></i>About Smart Energy Calculator</h1>
+        <p class="lead mb-0">Your AI-powered tool for smarter, greener, and more cost-effective electricity usage</p>
+    </div>
+    <div class="container">
+        <div class="about-section mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <h2 class="mb-3"><i class="fas fa-lightbulb about-icon"></i> What is Smart Energy Calculator?</h2>
+                    <p class="fs-5">Smart Energy Calculator is a modern web application that predicts your household's electricity consumption, visualizes appliance-wise usage, and delivers <b>personalized, AI-powered energy-saving recommendations</b>—all based on your real data, not generic tips.</p>
+                    <ul class="fs-5">
+                        <li>Accurate bill and load prediction</li>
+                        <li>Beautiful, interactive charts</li>
+                        <li>Actionable, appliance-specific AI advice</li>
+                        <li>Dark/yellow modern theme for clarity and accessibility</li>
+                    </ul>
+                </div>
+                <div class="col-md-5 text-center">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2917/2917242.png" alt="Energy Infographic" style="max-width: 220px; border-radius: 16px; box-shadow: 0 2px 12px #ffd60055;">
+                </div>
+            </div>
+        </div>
+        <div class="about-section mb-4">
+            <h2 class="mb-4 text-center"><i class="fas fa-cogs about-icon"></i> How It Works</h2>
+            <div class="about-infographic">
+                <div class="card">
+                    <div class="card-body">
+                        <i class="fas fa-users about-icon"></i>
+                        <h5>1. Enter Your Household & Appliances</h5>
+                        <p>Provide your family size and all appliances, including brand, model, and usage hours.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <i class="fas fa-chart-pie about-icon"></i>
+                        <h5>2. Get Instant Predictions</h5>
+                        <p>See your monthly bill, load, and appliance-wise breakdown with interactive charts.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <i class="fas fa-robot about-icon"></i>
+                        <h5>3. AI-Powered Recommendations</h5>
+                        <p>Receive tailored, actionable tips to save energy and money—no generic advice, only what fits your real usage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="about-section mb-4">
+            <h2 class="mb-4 text-center"><i class="fas fa-tools about-icon"></i> Technologies Used</h2>
+            <div class="text-center tech-icons mb-3">
+                <i class="fab fa-python" title="Python"></i>
+                <i class="fab fa-bootstrap" title="Bootstrap"></i>
+                <i class="fas fa-database" title="SQLite"></i>
+                <i class="fas fa-chart-bar" title="Chart.js"></i>
+                <i class="fas fa-brain" title="Groq Llama AI"></i>
+                <i class="fab fa-html5" title="HTML5"></i>
+                <i class="fab fa-css3-alt" title="CSS3"></i>
+                <i class="fab fa-js" title="JavaScript"></i>
+            </div>
+            <p class="text-center fs-5">Built with Flask, Bootstrap, Chart.js, Groq Llama AI, and a custom dark/yellow theme for a seamless, modern experience.</p>
+        </div>
+        <div class="about-section mb-4">
+            <h2 class="mb-4 text-center"><i class="fas fa-shield-alt about-icon"></i> Why Choose This App?</h2>
+            <ul class="fs-5">
+                <li><b>Truly personalized:</b> All advice is based on your real appliances, brands, and usage.</li>
+                <li><b>Transparent:</b> See exactly how your bill and savings are calculated.</li>
+                <li><b>Modern, accessible design:</b> Works beautifully on any device, day or night.</li>
+                <li><b>Open and reference-backed:</b> Uses official UP government tariff data and calculators.</li>
+            </ul>
+        </div>
+    </div>
+    <footer class="about-footer">
+        <div class="container">
+            <div class="mb-2">References:</div>
+            <a href="https://pvvnl.org/bill-calculator" target="_blank">UP PVVNL Bill Calculator</a> |
+            <a href="https://uppcl.org/site/writereaddata/siteContent/202305271716024661Public%20Notice%20English_FY2023-24.pdf" target="_blank">UPPCL Official Tariff Notice 2023-24</a>
+            <div class="mt-2" style="font-size:0.95em; color:#ffd60099;">&copy; 2024 Smart Energy Calculator. All rights reserved.</div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

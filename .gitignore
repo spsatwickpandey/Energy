@@ -1,0 +1,48 @@
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual environments ──────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Secrets — NEVER commit these ─────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IDE / OS ──────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+
+# ── Logs & temp ───────────────────────────────────────────
+*.log
+*.tmp
+*.bak
+tmp/
+
+# ── Local database artifacts ──────────────────────────────
+energy_calculator.db
+*.sqlite3
+*.db
+
+# ── Large utility files not needed in prod ────────────────
+get-pip.py
+
+# ── Jupyter ───────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
