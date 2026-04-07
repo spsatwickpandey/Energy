@@ -1,46 +1,23 @@
 """
-email_service.py — Gmail SMTP OTP sender
-Configure GMAIL_USER and GMAIL_APP_PASSWORD in .env to enable.
+email_service.py — Brevo API OTP sender
+Configure BREVO_API_KEY in .env to enable.
 Falls back to console print (dev mode) when not configured.
-
-How to get a Gmail App Password:
-  1. Go to https://myaccount.google.com/security
-  2. Enable 2-Step Verification (if not already on)
-  3. Go to https://myaccount.google.com/apppasswords
-  4. Type any name (e.g. "Smart Energy") → Generate
-  5. Copy the 16-character password → paste in .env (spaces are OK)
 """
 import os
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import requests
 from dotenv import load_dotenv, find_dotenv
 
 _PLACEHOLDERS = {
-    '', 'your_gmail@gmail.com', 'your_gmail_app_password_here',
-    'your_16_char_app_password', 'your16charapppassword',
-    'xxxxxxxxxxxxxxxxxxxx', 'your_app_password_here'
+    '', 'your_brevo_api_key_here'
 }
 
-
-def _load_gmail_creds():
+def _load_brevo_creds():
     """Always reload .env so changes take effect without server restart."""
     load_dotenv(find_dotenv(), override=True)
-    user = os.getenv('GMAIL_USER', '').strip()
-    pwd  = os.getenv('GMAIL_APP_PASSWORD', '').strip().replace(' ', '')
-    return user, pwd
+    return os.getenv('BREVO_API_KEY', '').strip()
 
-
-def _is_configured(user: str, pwd: str) -> bool:
-    return (
-        bool(user) and
-        user not in _PLACEHOLDERS and
-        '@' in user and
-        bool(pwd) and
-        pwd not in _PLACEHOLDERS and
-        len(pwd) >= 16  # 16 chars after stripping spaces
-    )
-
+def _is_configured(api_key: str) -> bool:
+    return bool(api_key) and api_key not in _PLACEHOLDERS
 
 def _build_html(name: str, otp: str) -> str:
     return f"""<!DOCTYPE html>
@@ -109,43 +86,56 @@ def _build_html(name: str, otp: str) -> str:
 
 def send_otp_email(to_email: str, otp: str, name: str):
     """
-    Send OTP via Gmail SMTP.
+    Send OTP via Brevo API.
     Reads credentials fresh from .env on every call — no server restart needed.
     Falls back to console print (dev mode) when credentials are not set.
     """
-    user, pwd = _load_gmail_creds()
+    api_key = _load_brevo_creds()
 
-    if _is_configured(user, pwd):
-        _send_gmail(to_email, otp, name, user, pwd)
+    if _is_configured(api_key):
+        _send_brevo(to_email, otp, name, api_key)
         return
 
     # ── DEV FALLBACK ──────────────────────────────────────────────────────────
     print(f"\n{'='*57}")
     print(f"  [DEV MODE] OTP for {name} ({to_email}): {otp}")
-    print(f"  Gmail not configured — update GMAIL_USER + GMAIL_APP_PASSWORD in .env")
+    print(f"  Brevo not configured — update BREVO_API_KEY in .env")
     print(f"{'='*57}\n")
 
 
-def _send_gmail(to_email: str, otp: str, name: str, user: str, pwd: str):
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = "Your Verification Code — Smart Energy Optimizer"
-    msg['From']    = f"Smart Energy Optimizer <{user}>"
-    msg['To']      = to_email
-    msg.attach(MIMEText(_build_html(name, otp), 'html'))
+def _send_brevo(to_email: str, otp: str, name: str, api_key: str):
+    url = "https://api.brevo.com/v3/smtp/email"
+
+    headers = {
+        "accept": "application/json",
+        "api-key": api_key,
+        "content-type": "application/json"
+    }
+
+    payload = {
+        "sender": {
+            "name": "Smart Energy Optimizer",
+            "email": "satwickpandey788@gmail.com"
+        },
+        "to": [
+            {
+                "email": to_email,
+                "name": name
+            }
+        ],
+        "subject": "Your Verification Code — Smart Energy Optimizer",
+        "htmlContent": _build_html(name, otp)
+    }
 
     try:
-        with smtplib.SMTP('smtp.gmail.com', 587, timeout=20) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(user, pwd)
-            server.sendmail(user, to_email, msg.as_string())
-        print(f"[email] ✓ OTP sent via Gmail → {to_email}")
-    except smtplib.SMTPAuthenticationError:
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        response.raise_for_status()
+        print(f"[email] ✓ OTP sent via Brevo → {to_email}")
+    except requests.exceptions.RequestException as e:
+        error_msg = str(e)
+        if e.response is not None:
+            error_msg += f" Response: {e.response.text}"
         raise RuntimeError(
-            "Gmail authentication failed. "
-            "Make sure GMAIL_APP_PASSWORD is a 16-character App Password "
-            "(NOT your regular Gmail password). "
-            "Generate one at: https://myaccount.google.com/apppasswords"
+            f"Brevo API error: {error_msg}\n"
+            "Make sure your BREVO_API_KEY is correct."
         )
-    except smtplib.SMTPException as e:
-        raise RuntimeError(f"Gmail SMTP error: {e}")
